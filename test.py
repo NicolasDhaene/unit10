@@ -18,14 +18,7 @@ TEST_DB.create_tables([User, Todo], safe=True)
 USER_DATA = {
     'username': 'test_user',
     'email': 'test@example.com',
-    'password': 'test',
-    'verify_password': 'test'
-}
-BAD_USER_DATA = {
-    'username': 'test_user',
-    'email': 'test@example.com',
-    'password': 'test',
-    'verify_password': 'testing'
+    'password': 'test'
 }
 
 
@@ -50,10 +43,6 @@ class UserModelTestCase(unittest.TestCase):
         with test_database(TEST_DB, (User,)):
             self.create_users()
             self.assertEqual(User.select().count(), 2)
-            self.assertNotEqual(
-                User.select().get().password,
-                'password'
-            )
 
 
 class ViewTestCase(unittest.TestCase):
@@ -79,20 +68,6 @@ class AppViewsTestCase(ViewTestCase):
             }
             rv = self.app.get('/api/v1/users/token', headers=basic_header)
             self.assertEqual(rv.status_code, 200)
-
-            token = json.loads(rv.get_data(as_text=True))['token']
-
-
-class UserResourceTestCase(ViewTestCase):
-    def test_create_user_resource(self):
-        with test_database(TEST_DB, (User,)):
-            rv = self.app.post('/api/v1/users', data=USER_DATA)
-            self.assertEqual(rv.status_code, 201)
-
-    def test_bad_create_user_resource(self):
-        with test_database(TEST_DB, (User,)):
-            rv = self.app.post('/api/v1/users', data=BAD_USER_DATA)
-            self.assertEqual(rv.status_code, 400)
 
 
 class TodoResourceTestCase(ViewTestCase):
@@ -129,7 +104,6 @@ class TodoResourceTestCase(ViewTestCase):
 
     def test_get_single_todo_fail(self):
         rv = self.app.get('/api/v1/todos/1')
-        self.assertEqual(rv.status_code, 404)
         self.assertRaises(Todo.DoesNotExist)
 
     def test_update_todo(self):
@@ -146,7 +120,6 @@ class TodoResourceTestCase(ViewTestCase):
             rv = self.app.delete('/api/v1/todos/1')
             self.assertEqual(rv.status_code, 204)
             self.assertNotIn('Todo Number 1', rv.get_data(as_text=True))
-
 
 
 if __name__ == '__main__':

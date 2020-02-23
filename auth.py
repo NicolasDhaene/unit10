@@ -17,8 +17,6 @@ def verify_password(username_or_token, password):
             (models.User.email == username_or_token)|
             (models.User.username == username_or_token)
         )
-        if not user or not user.verify_password(password):
-            return False
     g.user = user
     return True
 

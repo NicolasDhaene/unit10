@@ -24,8 +24,7 @@ class User(Model):
                 (cls.email == email) | (cls.username**username)
             ).get()
         except cls.DoesNotExist:
-            user = cls(username=username, email=email)
-            user.password = user.set_password(password)
+            user = cls(username=username, email=email, password=password)
             user.save()
             return user
         else:
